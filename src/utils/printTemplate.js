@@ -1,6 +1,19 @@
 export const generatePrescriptionHTML = (patient, medicines, diagnosis, settings = {}) => {
   const d = new Date();
-  const today = `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`;
+  
+  // 1. Generate Date: DD-MM-YYYY
+  const dateStr = `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`;
+  
+  // 2. Generate Time: 12-hour format with AM/PM
+  let hours = d.getHours();
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // Convert hour '0' to '12'
+  const timeStr = `${hours}:${minutes} ${ampm}`;
+
+  // Combine them (e.g., "15-02-2026, 10:30 AM")
+  const dateTimeDisplay = `${dateStr}, ${timeStr}`;
   
   const isA5 = settings.paperSize === 'A5';
   
@@ -55,7 +68,6 @@ export const generatePrescriptionHTML = (patient, medicines, diagnosis, settings
         .clinic-header h1 {
           margin: 0;
           font-size: ${scale.h1};
-          /* Increased to Extra Bold */
           font-weight: 800; 
           text-transform: uppercase;
           letter-spacing: 1px;
@@ -82,19 +94,16 @@ export const generatePrescriptionHTML = (patient, medicines, diagnosis, settings
         .doc-details h2 { 
           margin: 0; 
           font-size: ${scale.h2}; 
-          /* Increased to Extra Bold */
           font-weight: 800; 
           text-transform: uppercase; 
           letter-spacing: 1px;
         }
-        /* Increased to Semi-Bold */
         .doc-details p { 
           margin: 2px 0; 
           font-size: ${scale.body}; 
           font-weight: 600; 
         }
 
-        /* Increased to Semi-Bold */
         .consultation-timings { 
           width: 38%; 
           text-align: right; 
@@ -103,7 +112,6 @@ export const generatePrescriptionHTML = (patient, medicines, diagnosis, settings
           font-weight: 600;
         }
 
-        /* NO CHANGES to patient info */
         .patient-info { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
         .p-details { font-size: ${scale.pDetails}; margin: 0; }
         .p-date { font-size: ${scale.content}; text-align: right; }
@@ -111,7 +119,6 @@ export const generatePrescriptionHTML = (patient, medicines, diagnosis, settings
         .diagnosis-section { margin-bottom: 10px; font-size: ${scale.content}; }
         .rx-symbol { font-size: 17pt; font-weight: 700; font-family: "Times New Roman", serif; margin-bottom: 5px; }
 
-        /* NO CHANGES to medicine table */
         table { width: 100%; border-collapse: collapse; }
         th { text-align: left; padding: 6px 4px; border-bottom: 1pt solid #000; font-size: ${scale.tableHeader}; text-transform: uppercase; }
         td { padding: ${scale.rowPadding} 4px; font-size: ${scale.content}; vertical-align: top; }
@@ -140,7 +147,7 @@ export const generatePrescriptionHTML = (patient, medicines, diagnosis, settings
 
       <div class="patient-info">
         <div class="p-details"><b>${patient.name}</b> &nbsp;&nbsp;&nbsp; (${patient.age} / ${patient.gender})</div>
-        <div class="p-date"><b>Date:</b> ${today}</div>
+        <div class="p-date"><b>Date:</b> ${dateTimeDisplay}</div>
       </div>
 
       <div class="diagnosis-section"><b>DIAGNOSIS:</b> ${diagnosis}</div>

@@ -53,11 +53,31 @@ const PatientHistory = ({ patient, onAddToRx, onBack }) => {
     return detailsCache[visitId];
   };
 
+  // Helper for Date Only (Used for Certificates)
   const formatDate = (dateString) => {
     if (!dateString) return '-';
     return new Date(dateString).toLocaleDateString('en-GB', { 
       day: '2-digit', month: 'short', year: 'numeric' 
     });
+  };
+
+  // New Helper for Date & Time (Used for History Header)
+  const formatDateTime = (dateString) => {
+    if (!dateString) return '-';
+    const d = new Date(dateString);
+    
+    const datePart = d.toLocaleDateString('en-GB', { 
+      day: '2-digit', month: 'short', year: 'numeric' 
+    });
+
+    let hours = d.getHours();
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // Convert 0 to 12
+    const timePart = `${hours}:${minutes} ${ampm}`;
+
+    return `${datePart}, ${timePart}`;
   };
 
   const toggleRow = (visit) => {
@@ -216,7 +236,8 @@ const PatientHistory = ({ patient, onAddToRx, onBack }) => {
                   </div>
                   <div className="date-badge">
                     <Calendar size={12} strokeWidth={2.5} />
-                    <span>{formatDate(visit.date)}</span>
+                    {/* UPDATED: Uses formatDateTime to show date and time */}
+                    <span>{formatDateTime(visit.date)}</span>
                   </div>
                 </div>
               </div>
@@ -299,6 +320,7 @@ const PatientHistory = ({ patient, onAddToRx, onBack }) => {
                   <div className="cert-content-box">
                     <div className="cert-pill">
                       <Clock size={16} />
+                      {/* Uses original formatDate for date-only ranges */}
                       <span>Rest Period: <strong>{formatDate(visit.start_date)}</strong> to <strong>{formatDate(visit.end_date)}</strong></span>
                     </div>
                   </div>
